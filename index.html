@@ -1186,7 +1186,7 @@ const DEFAULT_DRIVERS = {
 // 2. Incolla il JSON di data.json e salva
 // 3. Copia l'ID dall'URL (es: da api.npoint.io/abc123 copia "abc123")
 // 4. Incollalo qui sotto:
-const NPOINT_ID = 'TUO_ID_NPOINT';  // es: 'abc123def456'
+const NPOINT_ID = 'cc103022a61d05b6c970';
 
 // Carica dati da npoint.io
 async function loadData() {
@@ -1210,7 +1210,7 @@ function saveData() {
   // Debounce: salva su npoint max ogni 1.5s per evitare troppe richieste
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
-    if (!NPOINT_ID || NPOINT_ID === 'cc103022a61d05b6c970') return;
+    if (!NPOINT_ID || NPOINT_ID === 'TUO_ID_NPOINT') return;
     try {
       await fetch('https://api.npoint.io/' + NPOINT_ID, {
         method: 'POST',
