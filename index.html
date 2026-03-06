@@ -222,13 +222,14 @@ html, body {
   border:1px solid rgba(0,170,255,.3);
   border-radius:4px;
   padding:4px 8px 3px;
+  margin-top:10px;
   text-align:center;
   position:relative;
 }
 .sp-board::before {
   content:'P';
   position:absolute;
-  top:-9px; left:50%;
+  top:-14px; left:50%;
   transform:translateX(-50%);
   width:15px; height:15px;
   background:#0055cc;
@@ -572,9 +573,10 @@ html, body {
   -webkit-tap-highlight-color:transparent;
 }
 .eopt.sel, .eopt:active { background:rgba(0,200,255,.18); border-color:var(--ac); }
-.add-row { display:flex; gap:6px; }
+.add-row { display:flex; gap:6px; overflow:hidden; }
 .add-inp {
   flex:1;
+  min-width:0;
   background:rgba(255,255,255,.06);
   border:1px solid rgba(255,255,255,.1);
   border-radius:10px; color:#fff;
