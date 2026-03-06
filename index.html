@@ -349,6 +349,13 @@ html, body {
   height: 100% !important;
   border-radius: 0;
 }
+.inv-panel.search-kb .drag-handle,
+.inv-panel.search-kb .ph,
+.inv-panel.search-kb .ph-stats,
+.inv-panel.search-kb .ph-tabs,
+.inv-panel.search-kb .add-sect {
+  display: none !important;
+}
 
 /* drag handle */
 .drag-handle {
@@ -1356,28 +1363,35 @@ if (window.visualViewport) {
     const keyboardH = wh - vvh;
     if (keyboardH > 100) {
       // Keyboard is open
-      panel.style.height = vvh + 'px';
-      panel.style.bottom = (wh - vvh - window.visualViewport.offsetTop) + 'px';
-      panel.classList.add('keyboard-open');
-
       const focused = document.activeElement;
       const isSearch = focused && focused.id === 'pSearch';
 
-      // Se il focus è sulla ricerca, nascondi "Aggiungi oggetto" per dare più spazio
       if (isSearch) {
-        addSect.style.display = 'none';
-        // Scroll il pannello in cima per vedere header + ricerca + lista
-        setTimeout(() => panel.scrollTop = 0, 80);
-      } else if (focused && panel.contains(focused)) {
-        // Per gli input di aggiunta, centra il campo attivo
-        setTimeout(() => focused.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
+        // Ricerca: pannello ancorato al top della viewport visibile
+        // Nascondi header/stats/tabs/add tramite CSS class
+        panel.classList.add('search-kb');
+        panel.style.top = window.visualViewport.offsetTop + 'px';
+        panel.style.bottom = 'auto';
+        panel.style.height = vvh + 'px';
+        panel.classList.add('keyboard-open');
+      } else {
+        // Aggiungi: comportamento originale dal basso
+        panel.classList.remove('search-kb');
+        panel.style.top = '';
+        panel.style.height = vvh + 'px';
+        panel.style.bottom = (wh - vvh - window.visualViewport.offsetTop) + 'px';
+        panel.classList.add('keyboard-open');
+        if (focused && panel.contains(focused)) {
+          setTimeout(() => focused.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
+        }
       }
     } else {
       // Keyboard closed
       panel.style.height = '';
       panel.style.bottom = '';
+      panel.style.top = '';
       panel.classList.remove('keyboard-open');
-      addSect.style.display = '';
+      panel.classList.remove('search-kb');
     }
   }
 
