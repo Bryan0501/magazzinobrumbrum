@@ -662,131 +662,12 @@ html, body {
 .data-btn-reset { border-color:rgba(255,60,60,.2); color:rgba(255,100,100,.4); }
 .data-btn-reset:active { background:rgba(255,50,50,.2); border-color:rgba(255,50,50,.4); color:#fff; }
 
-/* ── PIN LOCK SCREEN ── */
-.lock-screen {
-  position:fixed; inset:0;
-  z-index:9999;
-  background: var(--bg);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:20px;
-  transition: opacity .4s, transform .4s;
-}
-.lock-screen.unlocked {
-  opacity:0;
-  transform:scale(1.1);
-  pointer-events:none;
-}
-.lock-icon {
-  font-size:48px;
-  margin-bottom:4px;
-}
-.lock-title {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:28px;
-  letter-spacing:8px;
-  color:#fff;
-  text-align:center;
-}
-.lock-sub {
-  font-family:'Share Tech Mono',monospace;
-  font-size:10px;
-  letter-spacing:3px;
-  color:rgba(255,255,255,.3);
-}
-.pin-dots {
-  display:flex; gap:14px;
-  margin:8px 0 4px;
-}
-.pin-dot {
-  width:14px; height:14px;
-  border-radius:50%;
-  border:2px solid rgba(255,255,255,.25);
-  background:transparent;
-  transition:background .15s, border-color .15s, transform .15s;
-}
-.pin-dot.filled {
-  background:#00c8ff;
-  border-color:#00c8ff;
-  transform:scale(1.15);
-}
-.pin-dot.wrong {
-  background:#ff3040;
-  border-color:#ff3040;
-  animation:pinShake .4s ease;
-}
-@keyframes pinShake {
-  0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
-}
-.pin-pad {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  max-width:260px;
-  width:80%;
-}
-.pin-key {
-  aspect-ratio:1.4;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.05);
-  color:#fff;
-  font-family:'Bebas Neue',sans-serif;
-  font-size:26px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .12s, transform .12s;
-  min-height:54px;
-  user-select:none; -webkit-user-select:none;
-}
-.pin-key:active {
-  background:rgba(0,200,255,.25);
-  transform:scale(.93);
-}
-.pin-key.fn {
-  font-size:18px;
-  color:rgba(255,255,255,.4);
-  border-color:rgba(255,255,255,.06);
-  background:rgba(255,255,255,.02);
-}
-.pin-key.fn:active {
-  background:rgba(255,255,255,.08);
-}
+
 </style>
 </head>
 <body>
 
-<!-- PIN LOCK SCREEN -->
-<div class="lock-screen" id="lockScreen">
-  <div class="lock-icon">🔒</div>
-  <div class="lock-title">TEAM UFFICIO</div>
-  <div class="lock-sub">INSERISCI PIN</div>
-  <div class="pin-dots" id="pinDots">
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-  </div>
-  <div class="pin-pad" id="pinPad">
-    <div class="pin-key" data-n="1">1</div>
-    <div class="pin-key" data-n="2">2</div>
-    <div class="pin-key" data-n="3">3</div>
-    <div class="pin-key" data-n="4">4</div>
-    <div class="pin-key" data-n="5">5</div>
-    <div class="pin-key" data-n="6">6</div>
-    <div class="pin-key" data-n="7">7</div>
-    <div class="pin-key" data-n="8">8</div>
-    <div class="pin-key" data-n="9">9</div>
-    <div class="pin-key fn" data-n="clear">✕</div>
-    <div class="pin-key" data-n="0">0</div>
-    <div class="pin-key fn" data-n="del">⌫</div>
-  </div>
-</div>
-
-<div class="scene" id="mainScene" style="display:none">
+<div class="scene" id="mainScene">
 
   <!-- SKY + BUILDING -->
   <div class="sky-wrap">
@@ -1054,56 +935,7 @@ html, body {
 </div>
 
 <script>
-// ── PIN LOCK ──
-(function(){
-  const PIN = '1413';
-  const lockScreen = document.getElementById('lockScreen');
-  const mainScene = document.getElementById('mainScene');
-  const dots = document.querySelectorAll('#pinDots .pin-dot');
-  let entered = '';
 
-  function updateDots() {
-    dots.forEach((d, i) => {
-      d.classList.toggle('filled', i < entered.length);
-      d.classList.remove('wrong');
-    });
-  }
-
-  function unlock() {
-    lockScreen.classList.add('unlocked');
-    mainScene.style.display = '';
-    setTimeout(() => { lockScreen.style.display = 'none'; }, 500);
-  }
-
-  function wrongPin() {
-    dots.forEach(d => { d.classList.add('wrong'); d.classList.remove('filled'); });
-    setTimeout(() => { entered = ''; updateDots(); }, 500);
-  }
-
-  document.getElementById('pinPad').addEventListener('click', function(e) {
-    const key = e.target.closest('.pin-key');
-    if (!key) return;
-    const n = key.dataset.n;
-
-    if (n === 'clear') {
-      entered = '';
-      updateDots();
-    } else if (n === 'del') {
-      entered = entered.slice(0, -1);
-      updateDots();
-    } else {
-      if (entered.length >= 4) return;
-      entered += n;
-      updateDots();
-      if (entered.length === 4) {
-        setTimeout(() => {
-          if (entered === PIN) unlock();
-          else wrongPin();
-        }, 200);
-      }
-    }
-  });
-})();
 
 // ── STARS (canvas, crisp on retina) ──
 (function(){
