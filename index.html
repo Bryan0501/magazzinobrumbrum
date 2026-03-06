@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <title>Parcheggio – Team Ufficio</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap');
@@ -326,6 +329,7 @@ html, body {
   position:fixed;
   left:0; right:0; bottom:0;
   height: 88vh;
+  height: 88dvh;
   background: var(--panel-bg);
   border-top: 2px solid var(--ac);
   border-radius: 20px 20px 0 0;
@@ -340,6 +344,10 @@ html, body {
   box-shadow: 0 -20px 60px rgba(0,0,0,.8);
 }
 .inv-panel.open { transform: translateY(0); }
+.inv-panel.keyboard-open {
+  height: 100% !important;
+  border-radius: 0;
+}
 
 /* drag handle */
 .drag-handle {
@@ -421,6 +429,9 @@ html, body {
   font-size:16px; /* ≥16px prevents iOS zoom */
   outline:none;
   -webkit-appearance:none;
+  appearance:none;
+  -webkit-border-radius:10px;
+  touch-action:manipulation;
   transition:border-color .2s;
 }
 .search-inp:focus { border-color:var(--ac); }
@@ -531,8 +542,10 @@ html, body {
 .add-sect {
   padding:10px 18px calc(10px + var(--safe-bottom));
   border-top:1px solid rgba(255,255,255,.07);
-  background:rgba(0,0,0,.35);
+  background:rgba(0,0,0,.55);
   flex-shrink:0;
+  position:relative;
+  z-index:10;
 }
 .add-sect h4 {
   font-family:'Share Tech Mono',monospace;
@@ -570,8 +583,12 @@ html, body {
   font-size:16px; /* ≥16 to prevent iOS zoom */
   outline:none;
   -webkit-appearance:none;
+  appearance:none;
   transition:border-color .2s;
   min-height:44px;
+  /* iOS fixes */
+  -webkit-border-radius:10px;
+  touch-action:manipulation;
 }
 .add-inp:focus { border-color:var(--ac); }
 .add-inp::placeholder { color:rgba(255,255,255,.2); font-size:12px; }
@@ -611,10 +628,156 @@ html, body {
   transition:background .2s, transform .2s;
 }
 .sdot.active { background:rgba(0,200,255,.8); transform:scale(1.4); }
+
+/* ── DATA BAR ── */
+.data-bar {
+  position:absolute;
+  top:6px; right:8px;
+  display:flex; gap:5px;
+  z-index:10;
+}
+.data-btn {
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  color:rgba(255,255,255,.5);
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:1px;
+  padding:5px 8px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:all .15s;
+  min-height:30px;
+}
+.data-btn:active { background:rgba(0,200,255,.2); border-color:rgba(0,200,255,.4); color:#fff; }
+.data-btn-reset { border-color:rgba(255,60,60,.2); color:rgba(255,100,100,.4); }
+.data-btn-reset:active { background:rgba(255,50,50,.2); border-color:rgba(255,50,50,.4); color:#fff; }
+
+/* ── PIN LOCK SCREEN ── */
+.lock-screen {
+  position:fixed; inset:0;
+  z-index:9999;
+  background: var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  transition: opacity .4s, transform .4s;
+}
+.lock-screen.unlocked {
+  opacity:0;
+  transform:scale(1.1);
+  pointer-events:none;
+}
+.lock-icon {
+  font-size:48px;
+  margin-bottom:4px;
+}
+.lock-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;
+  letter-spacing:8px;
+  color:#fff;
+  text-align:center;
+}
+.lock-sub {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  color:rgba(255,255,255,.3);
+}
+.pin-dots {
+  display:flex; gap:14px;
+  margin:8px 0 4px;
+}
+.pin-dot {
+  width:14px; height:14px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.25);
+  background:transparent;
+  transition:background .15s, border-color .15s, transform .15s;
+}
+.pin-dot.filled {
+  background:#00c8ff;
+  border-color:#00c8ff;
+  transform:scale(1.15);
+}
+.pin-dot.wrong {
+  background:#ff3040;
+  border-color:#ff3040;
+  animation:pinShake .4s ease;
+}
+@keyframes pinShake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+}
+.pin-pad {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  max-width:260px;
+  width:80%;
+}
+.pin-key {
+  aspect-ratio:1.4;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  color:#fff;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .12s, transform .12s;
+  min-height:54px;
+  user-select:none; -webkit-user-select:none;
+}
+.pin-key:active {
+  background:rgba(0,200,255,.25);
+  transform:scale(.93);
+}
+.pin-key.fn {
+  font-size:18px;
+  color:rgba(255,255,255,.4);
+  border-color:rgba(255,255,255,.06);
+  background:rgba(255,255,255,.02);
+}
+.pin-key.fn:active {
+  background:rgba(255,255,255,.08);
+}
 </style>
 </head>
 <body>
-<div class="scene">
+
+<!-- PIN LOCK SCREEN -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">TEAM UFFICIO</div>
+  <div class="lock-sub">INSERISCI PIN</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot"></div>
+    <div class="pin-dot"></div>
+    <div class="pin-dot"></div>
+    <div class="pin-dot"></div>
+  </div>
+  <div class="pin-pad" id="pinPad">
+    <div class="pin-key" data-n="1">1</div>
+    <div class="pin-key" data-n="2">2</div>
+    <div class="pin-key" data-n="3">3</div>
+    <div class="pin-key" data-n="4">4</div>
+    <div class="pin-key" data-n="5">5</div>
+    <div class="pin-key" data-n="6">6</div>
+    <div class="pin-key" data-n="7">7</div>
+    <div class="pin-key" data-n="8">8</div>
+    <div class="pin-key" data-n="9">9</div>
+    <div class="pin-key fn" data-n="clear">✕</div>
+    <div class="pin-key" data-n="0">0</div>
+    <div class="pin-key fn" data-n="del">⌫</div>
+  </div>
+</div>
+
+<div class="scene" id="mainScene" style="display:none">
 
   <!-- SKY + BUILDING -->
   <div class="sky-wrap">
@@ -847,6 +1010,13 @@ html, body {
     </div>
 
     <div class="scroll-hint" id="scrollHint">scorri ›</div>
+
+    <!-- Data management buttons -->
+    <div class="data-bar">
+      <button class="data-btn" onclick="exportData()" title="Esporta backup">💾 Esporta</button>
+      <button class="data-btn" onclick="importData()" title="Importa backup">📂 Importa</button>
+      <button class="data-btn data-btn-reset" onclick="resetData()" title="Ripristina dati iniziali">🔄 Reset</button>
+    </div>
   </div><!-- /ground -->
 </div><!-- /scene -->
 
@@ -876,14 +1046,73 @@ html, body {
     <h4>+ Aggiungi oggetto</h4>
     <div class="emoji-scroll" id="emojiRow"></div>
     <div class="add-row">
-      <input class="add-inp" id="pName" placeholder="Nome..." style="flex:2" autocomplete="off" autocorrect="off" spellcheck="false">
-      <input class="add-inp" id="pCatIn" placeholder="Cat..." style="flex:1" autocomplete="off" autocorrect="off" spellcheck="false">
-      <button class="add-btn" onclick="addItem()">ADD</button>
+      <input class="add-inp" id="pName" placeholder="Nome..." style="flex:2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" inputmode="text">
+      <input class="add-inp" id="pCatIn" placeholder="Cat..." style="flex:1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" inputmode="text">
+      <button class="add-btn" onclick="addItem()" type="button">ADD</button>
     </div>
   </div>
 </div>
 
 <script>
+// ── PIN LOCK ──
+(function(){
+  const PIN = '1234';
+  const SESSION_KEY = 'brumbrum_unlocked';
+  const lockScreen = document.getElementById('lockScreen');
+  const mainScene = document.getElementById('mainScene');
+  const dots = document.querySelectorAll('#pinDots .pin-dot');
+  let entered = '';
+
+  // Se già sbloccato in questa sessione, salta
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    lockScreen.style.display = 'none';
+    mainScene.style.display = '';
+  }
+
+  function updateDots() {
+    dots.forEach((d, i) => {
+      d.classList.toggle('filled', i < entered.length);
+      d.classList.remove('wrong');
+    });
+  }
+
+  function unlock() {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    lockScreen.classList.add('unlocked');
+    mainScene.style.display = '';
+    setTimeout(() => { lockScreen.style.display = 'none'; }, 500);
+  }
+
+  function wrongPin() {
+    dots.forEach(d => { d.classList.add('wrong'); d.classList.remove('filled'); });
+    setTimeout(() => { entered = ''; updateDots(); }, 500);
+  }
+
+  document.getElementById('pinPad').addEventListener('click', function(e) {
+    const key = e.target.closest('.pin-key');
+    if (!key) return;
+    const n = key.dataset.n;
+
+    if (n === 'clear') {
+      entered = '';
+      updateDots();
+    } else if (n === 'del') {
+      entered = entered.slice(0, -1);
+      updateDots();
+    } else {
+      if (entered.length >= 4) return;
+      entered += n;
+      updateDots();
+      if (entered.length === 4) {
+        setTimeout(() => {
+          if (entered === PIN) unlock();
+          else wrongPin();
+        }, 200);
+      }
+    }
+  });
+})();
+
 // ── STARS (canvas, crisp on retina) ──
 (function(){
   const c = document.getElementById('starsCanvas');
@@ -949,51 +1178,78 @@ html, body {
 })();
 
 // ── DATA ──
-const EMOJIS = ['📦','🔌','💻','📱','🔋','🔧','🪛','🔩','🛞','🧰','⚡','🔐','💾','🗄️','🔦','📡','🎙️','🔑','📷','🎮','🖥️','⌨️','🖱️','🧲','🪝','📎','🗜️','🪤','📺','📟'];
+const EMOJIS = ['💻','🖥️','🖨️','⌨️','🖱️','📱','🔌','🔋','💾','💿','📀','🗄️','📡','📺','📟','⚡','🔧','🪛','📦','📎'];
 
-const DRIVERS = {
-  daniel:  { name:'DANIEL',  car:'FERRARI 296 GT3',    color:'#ff4040', nextId:10,
-    items:[
-      {id:1,emoji:'🔧',name:'Kit attrezzi racing',    cat:'Strumenti',    qty:1},
-      {id:2,emoji:'🛞',name:'Set pneumatici slick',   cat:'Pneumatici',   qty:4},
-      {id:3,emoji:'🔩',name:'Bulloni cerchi M12',     cat:'Ricambi',      qty:20},
-      {id:4,emoji:'🔋',name:'Carica batteria lithium',cat:'Elettronica',  qty:1},
-      {id:5,emoji:'💾',name:'Centralina ECU backup',  cat:'Elettronica',  qty:1},
-      {id:6,emoji:'🧰',name:'Trolley porta-attrezzi', cat:'Strumenti',    qty:1},
-      {id:7,emoji:'📡',name:'Radio intercomunicatore',cat:'Comunicazione', qty:2},
-    ]},
-  giovanni:{ name:'GIOVANNI', car:"ALFA ROMEO 145 '90", color:'#ff3333', nextId:10,
-    items:[
-      {id:1,emoji:'🔌',name:'Cavo avviamento',        cat:'Cavi',         qty:1},
-      {id:2,emoji:'🔧',name:'Chiave combinata set',   cat:'Strumenti',    qty:1},
-      {id:3,emoji:'💾',name:'Manuale officina 145',   cat:'Documenti',    qty:1},
-      {id:4,emoji:'🔩',name:'Kit guarnizioni motore', cat:'Ricambi',      qty:1},
-      {id:5,emoji:'🛞',name:'Ruota di scorta',        cat:'Pneumatici',   qty:1},
-      {id:6,emoji:'🔋',name:'Batteria 12V 60Ah',      cat:'Elettronica',  qty:1},
-    ]},
-  paolo:   { name:'PAOLO',   car:'PEUGEOT 5008 • 2005', color:'#3399ff', nextId:10,
-    items:[
-      {id:1,emoji:'📦',name:'Box portaoggetti',        cat:'Organizzazione',qty:3},
-      {id:2,emoji:'🔌',name:'Cavo USB-C 2m',           cat:'Cavi',          qty:2},
-      {id:3,emoji:'💻',name:'Laptop da lavoro',        cat:'Elettronica',   qty:1},
-      {id:4,emoji:'🎮',name:'Tablet bambini',          cat:'Elettronica',   qty:1},
-      {id:5,emoji:'🧰',name:'Kit emergenza auto',      cat:'Sicurezza',     qty:1},
-      {id:6,emoji:'📷',name:'Dashcam anteriore',       cat:'Elettronica',   qty:1},
-      {id:7,emoji:'🔋',name:'Powerbank 20000mAh',      cat:'Elettronica',   qty:2},
-      {id:8,emoji:'🗄️',name:'Cassettiera bagagliaio', cat:'Organizzazione',qty:1},
-    ]},
-  stefano: { name:'STEFANO', car:'BENTLEY CONTINENTAL', color:'#50c878', nextId:10,
-    items:[
-      {id:1,emoji:'🔑',name:'Chiave meccanica originale',cat:'Accessori',   qty:2},
-      {id:2,emoji:'💻',name:'Tablet controllo ECU',      cat:'Elettronica', qty:1},
-      {id:3,emoji:'📱',name:'Telefono di servizio',      cat:'Elettronica', qty:1},
-      {id:4,emoji:'🔌',name:'Adattatore OBD2',           cat:'Diagnostica', qty:1},
-      {id:5,emoji:'🧲',name:'Ombrello telescopico',      cat:'Accessori',   qty:1},
-      {id:6,emoji:'📦',name:'Borse in pelle Bentley',    cat:'Accessori',   qty:2},
-    ]},
+const DEFAULT_DRIVERS = {
+  daniel:  { name:'DANIEL',  car:'FERRARI 296 GT3',    color:'#ff4040', nextId:1, items:[] },
+  giovanni:{ name:'GIOVANNI', car:"ALFA ROMEO 145 '90", color:'#ff3333', nextId:1, items:[] },
+  paolo:   { name:'PAOLO',   car:'PEUGEOT 5008 • 2005', color:'#3399ff', nextId:1, items:[] },
+  stefano: { name:'STEFANO', car:'BENTLEY CONTINENTAL', color:'#50c878', nextId:1, items:[] },
 };
 
-let curDriver = null, activeTab = 'Tutti', selEmoji = '📦';
+// Carica dati da localStorage, oppure usa i default
+function loadData() {
+  const saved = localStorage.getItem('brumbrum_data');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) { /* fallback */ }
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
+}
+
+// Salva dati su localStorage
+function saveData() {
+  localStorage.setItem('brumbrum_data', JSON.stringify(DRIVERS));
+}
+
+// Esporta dati come file JSON
+function exportData() {
+  const blob = new Blob([JSON.stringify(DRIVERS, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'brumbrum_backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Importa dati da file JSON
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (typeof data === 'object' && data !== null) {
+          Object.assign(DRIVERS, data);
+          saveData();
+          if (curDriver) { renderTabs(); renderList(); }
+          alert('✅ Dati importati con successo!');
+        }
+      } catch(err) {
+        alert('❌ File non valido');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// Reset ai dati iniziali
+function resetData() {
+  if (!confirm('⚠️ Vuoi ripristinare tutti i dati iniziali? Le modifiche andranno perse.')) return;
+  Object.keys(DRIVERS).forEach(k => delete DRIVERS[k]);
+  Object.assign(DRIVERS, JSON.parse(JSON.stringify(DEFAULT_DRIVERS)));
+  saveData();
+  if (curDriver) { renderTabs(); renderList(); }
+}
+
+let DRIVERS = loadData();
+
+let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
 
 // Build emoji picker
 const emojiRow = document.getElementById('emojiRow');
@@ -1086,11 +1342,13 @@ function chQty(did,id,delta){
   if(!it) return;
   it.qty = Math.max(0,it.qty+delta);
   if(!it.qty){ delItem(did,id); return; }
+  saveData();
   renderTabs(); renderList();
 }
 
 function delItem(did,id){
   DRIVERS[did].items = DRIVERS[did].items.filter(i=>i.id!==id);
+  saveData();
   renderTabs(); renderList();
 }
 
@@ -1104,11 +1362,60 @@ function addItem(){
   document.getElementById('pName').value  = '';
   document.getElementById('pCatIn').value = '';
   activeTab = 'Tutti';
+  saveData();
   renderTabs(); renderList();
   setTimeout(()=>{ document.getElementById('pList').scrollTop=99999; },50);
 }
 
-document.getElementById('pName').addEventListener('keydown',e=>{ if(e.key==='Enter') addItem(); });
+// ── iOS KEYBOARD HANDLING ──
+const pNameInput = document.getElementById('pName');
+const pCatInput = document.getElementById('pCatIn');
+
+pNameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { pCatInput.focus(); e.preventDefault(); }
+});
+pCatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { addItem(); pCatInput.blur(); e.preventDefault(); }
+});
+
+// Handle iOS visualViewport for keyboard
+if (window.visualViewport) {
+  const panel = document.getElementById('invPanel');
+  const addSect = panel.querySelector('.add-sect');
+  let origHeight = 0;
+
+  function onViewportResize() {
+    const vvh = window.visualViewport.height;
+    const wh = window.innerHeight;
+    const keyboardH = wh - vvh;
+    if (keyboardH > 100) {
+      // Keyboard is open
+      panel.style.height = vvh + 'px';
+      panel.style.bottom = (wh - vvh - window.visualViewport.offsetTop) + 'px';
+      panel.classList.add('keyboard-open');
+      // Scroll to keep add section visible
+      addSect.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    } else {
+      // Keyboard closed
+      panel.style.height = '';
+      panel.style.bottom = '';
+      panel.classList.remove('keyboard-open');
+    }
+  }
+
+  window.visualViewport.addEventListener('resize', onViewportResize);
+  window.visualViewport.addEventListener('scroll', onViewportResize);
+}
+
+// Prevent iOS rubber-banding on panel itself
+document.getElementById('invPanel').addEventListener('touchmove', function(e) {
+  const list = document.getElementById('pList');
+  if (!list.contains(e.target) && !document.getElementById('emojiRow').contains(e.target) && !document.getElementById('pTabs').contains(e.target)) {
+    // Only prevent if not scrolling a scrollable area
+    if (e.target.closest('.item-list') || e.target.closest('.emoji-scroll') || e.target.closest('.ph-tabs')) return;
+    e.preventDefault();
+  }
+}, { passive: false });
 </script>
 </body>
 </html>
