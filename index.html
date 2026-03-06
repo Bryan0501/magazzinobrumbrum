@@ -1359,8 +1359,16 @@ if (window.visualViewport) {
       panel.style.height = vvh + 'px';
       panel.style.bottom = (wh - vvh - window.visualViewport.offsetTop) + 'px';
       panel.classList.add('keyboard-open');
-      // Scroll to keep the focused input visible
+
       const focused = document.activeElement;
+      const isSearch = focused && focused.id === 'pSearch';
+
+      // Se il focus è sulla ricerca, nascondi "Aggiungi oggetto" per dare più spazio
+      if (isSearch) {
+        addSect.style.display = 'none';
+      }
+
+      // Scroll per tenere visibile il campo attivo
       if (focused && panel.contains(focused)) {
         setTimeout(() => focused.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
       }
@@ -1369,6 +1377,7 @@ if (window.visualViewport) {
       panel.style.height = '';
       panel.style.bottom = '';
       panel.classList.remove('keyboard-open');
+      addSect.style.display = '';
     }
   }
 
