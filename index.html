@@ -1181,18 +1181,46 @@ const DEFAULT_DRIVERS = {
   stefano: { name:'STEFANO', car:'BENTLEY CONTINENTAL', color:'#50c878', nextId:1, items:[] },
 };
 
-// Carica dati da localStorage, oppure usa i default
-function loadData() {
-  const saved = localStorage.getItem('brumbrum_data');
-  if (saved) {
-    try { return JSON.parse(saved); } catch(e) { /* fallback */ }
+// ── NPOINT.IO CONFIG ──
+// 1. Vai su https://www.npoint.io/
+// 2. Incolla il JSON di data.json e salva
+// 3. Copia l'ID dall'URL (es: da api.npoint.io/abc123 copia "abc123")
+// 4. Incollalo qui sotto:
+const NPOINT_ID = 'TUO_ID_NPOINT';  // es: 'abc123def456'
+
+// Carica dati da npoint.io
+async function loadData() {
+  try {
+    const res = await fetch('https://api.npoint.io/' + NPOINT_ID);
+    if (res.ok) return await res.json();
+  } catch(e) {
+    console.warn('Fetch npoint fallito, provo localStorage', e);
   }
+  // Fallback: localStorage
+  const saved = localStorage.getItem('brumbrum_data');
+  if (saved) { try { return JSON.parse(saved); } catch(e) {} }
   return JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
 }
 
-// Salva dati su localStorage
+// Salva dati su npoint.io + localStorage
+let _saveTimer = null;
 function saveData() {
   localStorage.setItem('brumbrum_data', JSON.stringify(DRIVERS));
+
+  // Debounce: salva su npoint max ogni 1.5s per evitare troppe richieste
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
+    if (!NPOINT_ID || NPOINT_ID === 'cc103022a61d05b6c970') return;
+    try {
+      await fetch('https://api.npoint.io/' + NPOINT_ID, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(DRIVERS),
+      });
+    } catch(e) {
+      console.error('Errore salvataggio npoint:', e);
+    }
+  }, 1500);
 }
 
 // Esporta dati come file JSON
@@ -1218,6 +1246,7 @@ function importData() {
       try {
         const data = JSON.parse(ev.target.result);
         if (typeof data === 'object' && data !== null) {
+          Object.keys(DRIVERS).forEach(k => delete DRIVERS[k]);
           Object.assign(DRIVERS, data);
           saveData();
           if (curDriver) { renderTabs(); renderList(); }
@@ -1241,7 +1270,13 @@ function resetData() {
   if (curDriver) { renderTabs(); renderList(); }
 }
 
-let DRIVERS = loadData();
+// Caricamento iniziale asincrono
+let DRIVERS = JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
+(async function() {
+  DRIVERS = await loadData();
+  // Aggiorna il pannello se è aperto
+  if (curDriver) { renderTabs(); renderList(); }
+})();
 
 let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
 
