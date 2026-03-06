@@ -1057,17 +1057,10 @@ html, body {
 // ── PIN LOCK ──
 (function(){
   const PIN = '1234';
-  const SESSION_KEY = 'brumbrum_unlocked';
   const lockScreen = document.getElementById('lockScreen');
   const mainScene = document.getElementById('mainScene');
   const dots = document.querySelectorAll('#pinDots .pin-dot');
   let entered = '';
-
-  // Se già sbloccato in questa sessione, salta
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    lockScreen.style.display = 'none';
-    mainScene.style.display = '';
-  }
 
   function updateDots() {
     dots.forEach((d, i) => {
@@ -1077,7 +1070,6 @@ html, body {
   }
 
   function unlock() {
-    sessionStorage.setItem(SESSION_KEY, '1');
     lockScreen.classList.add('unlocked');
     mainScene.style.display = '';
     setTimeout(() => { lockScreen.style.display = 'none'; }, 500);
