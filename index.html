@@ -1366,10 +1366,10 @@ if (window.visualViewport) {
       // Se il focus è sulla ricerca, nascondi "Aggiungi oggetto" per dare più spazio
       if (isSearch) {
         addSect.style.display = 'none';
-      }
-
-      // Scroll per tenere visibile il campo attivo
-      if (focused && panel.contains(focused)) {
+        // Scroll il pannello in cima per vedere header + ricerca + lista
+        setTimeout(() => panel.scrollTop = 0, 80);
+      } else if (focused && panel.contains(focused)) {
+        // Per gli input di aggiunta, centra il campo attivo
         setTimeout(() => focused.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
       }
     } else {
