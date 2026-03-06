@@ -1209,8 +1209,13 @@ function saveData() {
   }, 1500);
 }
 
-
+let DRIVERS = {};
 let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
+
+// Carica dati all'avvio
+(async function init() {
+  DRIVERS = await loadData();
+})();
 
 // Build emoji picker
 const emojiRow = document.getElementById('emojiRow');
