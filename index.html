@@ -1188,25 +1188,20 @@ const DEFAULT_DRIVERS = {
 // 4. Incollalo qui sotto:
 const NPOINT_ID = 'cc103022a61d05b6c970';
 
-// Carica dati da npoint.io
+// Carica dati da npoint.io (sempre remoto, niente cache locale)
 async function loadData() {
   try {
     const res = await fetch('https://api.npoint.io/' + NPOINT_ID);
     if (res.ok) return await res.json();
   } catch(e) {
-    console.warn('Fetch npoint fallito, provo localStorage', e);
+    console.warn('Fetch npoint fallito', e);
   }
-  // Fallback: localStorage
-  const saved = localStorage.getItem('brumbrum_data');
-  if (saved) { try { return JSON.parse(saved); } catch(e) {} }
   return JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
 }
 
-// Salva dati su npoint.io + localStorage
+// Salva dati su npoint.io
 let _saveTimer = null;
 function saveData() {
-  localStorage.setItem('brumbrum_data', JSON.stringify(DRIVERS));
-
   // Debounce: salva su npoint max ogni 1.5s per evitare troppe richieste
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
