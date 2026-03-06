@@ -1013,15 +1013,6 @@ html, body {
 
     <div class="scroll-hint" id="scrollHint">scorri ›</div>
 
-    <!-- Data management buttons -->
-    <div class="data-bar">
-      <button class="data-btn" onclick="exportData()" title="Esporta backup">💾 Esporta</button>
-      <button class="data-btn" onclick="importData()" title="Importa backup">📂 Importa</button>
-      <button class="data-btn data-btn-reset" onclick="resetData()" title="Ripristina dati iniziali">🔄 Reset</button>
-    </div>
-  </div><!-- /ground -->
-</div><!-- /scene -->
-
 <!-- OVERLAY -->
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
 
@@ -1218,60 +1209,6 @@ function saveData() {
   }, 1500);
 }
 
-// Esporta dati come file JSON
-function exportData() {
-  const blob = new Blob([JSON.stringify(DRIVERS, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'brumbrum_backup.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-// Importa dati da file JSON
-function importData() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        if (typeof data === 'object' && data !== null) {
-          Object.keys(DRIVERS).forEach(k => delete DRIVERS[k]);
-          Object.assign(DRIVERS, data);
-          saveData();
-          if (curDriver) { renderTabs(); renderList(); }
-          alert('✅ Dati importati con successo!');
-        }
-      } catch(err) {
-        alert('❌ File non valido');
-      }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
-// Reset ai dati iniziali
-function resetData() {
-  if (!confirm('⚠️ Vuoi ripristinare tutti i dati iniziali? Le modifiche andranno perse.')) return;
-  Object.keys(DRIVERS).forEach(k => delete DRIVERS[k]);
-  Object.assign(DRIVERS, JSON.parse(JSON.stringify(DEFAULT_DRIVERS)));
-  saveData();
-  if (curDriver) { renderTabs(); renderList(); }
-}
-
-// Caricamento iniziale asincrono
-let DRIVERS = JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
-(async function() {
-  DRIVERS = await loadData();
-  // Aggiorna il pannello se è aperto
-  if (curDriver) { renderTabs(); renderList(); }
-})();
 
 let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
 
@@ -1417,8 +1354,11 @@ if (window.visualViewport) {
       panel.style.height = vvh + 'px';
       panel.style.bottom = (wh - vvh - window.visualViewport.offsetTop) + 'px';
       panel.classList.add('keyboard-open');
-      // Scroll to keep add section visible
-      addSect.scrollIntoView({ block: 'end', behavior: 'smooth' });
+      // Scroll to keep the focused input visible
+      const focused = document.activeElement;
+      if (focused && panel.contains(focused)) {
+        setTimeout(() => focused.scrollIntoView({ block: 'center', behavior: 'smooth' }), 80);
+      }
     } else {
       // Keyboard closed
       panel.style.height = '';
