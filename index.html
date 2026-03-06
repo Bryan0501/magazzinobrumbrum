@@ -1154,21 +1154,6 @@ html, body {
   }, {passive:true});
 })();
 
-// ── PANEL SWIPE TO CLOSE ──
-(function(){
-  const panel = document.getElementById('invPanel');
-  let startY=0, startT=0;
-  panel.addEventListener('touchstart',e=>{
-    startY = e.touches[0].clientY;
-    startT = Date.now();
-  },{passive:true});
-  panel.addEventListener('touchend',e=>{
-    const dy = e.changedTouches[0].clientY - startY;
-    const dt = Date.now() - startT;
-    if(dy>80 && dt<350) closePanel();
-  },{passive:true});
-})();
-
 // ── DATA ──
 const EMOJIS = ['💻','🖥️','🖨️','⌨️','🖱️','📱','🔌','🔋','💾','💿','📀','🗄️','📡','📺','📟','⚡','🔧','🪛','📦','📎'];
 
