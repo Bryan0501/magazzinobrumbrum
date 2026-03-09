@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
 <title>Parcheggio – Team Ufficio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🅿️</text></svg>">
+<link rel="manifest" href="manifest.json">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap');
 
@@ -80,7 +82,7 @@ html, body {
   grid-template-rows: repeat(11,1fr);
   gap: 2px 3px;
 }
-.w { border-radius:1px; background:rgba(15,40,80,.4); }
+.w { border-radius:1px; background:rgba(15,40,80,.4); transition:background .8s ease; }
 .w.a { background:rgba(255,215,100,.28); }
 .w.c { background:rgba(80,180,255,.2); }
 .w.w2{ background:rgba(220,240,255,.28); }
@@ -279,6 +281,7 @@ html, body {
   min-height:44px;
 }
 .car-tap:active { transform:scale(.96) translateY(-2px); filter:drop-shadow(0 0 10px rgba(0,200,255,.5)); }
+@media(hover:hover){.car-tap:hover{transform:translateY(-3px);filter:drop-shadow(0 0 12px rgba(0,200,255,.4))}}
 
 .spot:nth-child(1) .car-tap{animation-delay:.1s}
 .spot:nth-child(2) .car-tap{animation-delay:.2s}
@@ -349,21 +352,11 @@ html, body {
   height: 100% !important;
   border-radius: 0;
 }
-.inv-panel.search-kb .drag-handle,
 .inv-panel.search-kb .ph,
 .inv-panel.search-kb .ph-stats,
 .inv-panel.search-kb .ph-tabs,
 .inv-panel.search-kb .add-sect {
   display: none !important;
-}
-
-/* drag handle */
-.drag-handle {
-  width:36px; height:4px;
-  background:rgba(255,255,255,.2);
-  border-radius:2px;
-  margin: 10px auto 0;
-  flex-shrink:0;
 }
 
 /* panel header */
@@ -619,9 +612,8 @@ html, body {
 }
 .lpole { width:4px; height:70px; background:linear-gradient(90deg,#2a2a2a,#555,#2a2a2a); margin:0 auto; border-radius:2px; }
 .larm  { position:absolute; top:0; width:30px; height:4px; background:#444; border-radius:2px; }
-.lbulb { position:absolute; top:4px; width:12px; height:7px; background:rgba(255,228,110,.9); border-radius:2px 2px 4px 4px; box-shadow:0 0 14px 5px rgba(255,210,60,.28),0 0 40px 14px rgba(255,200,60,.09); }
-
-@keyframes twinkle{0%,100%{opacity:inherit}50%{opacity:.08}}
+.lbulb { position:absolute; top:4px; width:12px; height:7px; background:rgba(255,228,110,.9); border-radius:2px 2px 4px 4px; box-shadow:0 0 14px 5px rgba(255,210,60,.28),0 0 40px 14px rgba(255,200,60,.09); animation:bulbPulse 3s ease-in-out infinite; }
+@keyframes bulbPulse{0%,100%{opacity:1;box-shadow:0 0 14px 5px rgba(255,210,60,.28),0 0 40px 14px rgba(255,200,60,.09)}50%{opacity:.75;box-shadow:0 0 8px 3px rgba(255,210,60,.18),0 0 25px 8px rgba(255,200,60,.05)}}
 
 /* ── SCROLL INDICATOR DOTS ── */
 .scroll-dots {
@@ -782,10 +774,58 @@ html, body {
   }
 }
 
+/* ── TOAST ── */
+.save-toast {
+  position:fixed;
+  bottom:30px; left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(0,200,100,.92);
+  color:#000;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  letter-spacing:2px;
+  padding:8px 20px;
+  border-radius:20px;
+  opacity:0;
+  transition:opacity .3s, transform .3s;
+  z-index:200;
+  pointer-events:none;
+}
+.save-toast.show {
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* ── LOADING ── */
+.loading-overlay {
+  position:fixed; inset:0;
+  background:var(--bg);
+  z-index:300;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:opacity .5s;
+}
+.loading-overlay.hidden {
+  opacity:0;
+  pointer-events:none;
+}
+.loading-spinner {
+  width:30px; height:30px;
+  border:3px solid rgba(255,255,255,.1);
+  border-top-color:#00c8ff;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 
 </style>
 </head>
 <body>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+<div class="save-toast" id="saveToast">✓ SALVATO</div>
 
 <div class="scene" id="mainScene">
 
@@ -1059,7 +1099,6 @@ html, body {
 
 <!-- BOTTOM SHEET PANEL -->
 <div class="inv-panel" id="invPanel">
-  <div class="drag-handle"></div>
   <div class="ph">
     <div>
       <div class="ph-owner" id="pOwner"></div>
@@ -1090,41 +1129,60 @@ html, body {
 <script>
 
 
-// ── STARS (canvas, crisp on retina) ──
+// ── STARS (canvas with twinkle) ──
 (function(){
   const c = document.getElementById('starsCanvas');
   const wrap = c.parentElement;
   const dpr = window.devicePixelRatio || 1;
-  function resize(){
-    c.width  = wrap.offsetWidth  * dpr;
-    c.height = wrap.offsetHeight * dpr;
-    c.style.width  = wrap.offsetWidth  + 'px';
-    c.style.height = wrap.offsetHeight + 'px';
-    const ctx = c.getContext('2d');
-    ctx.scale(dpr,dpr);
-    for(let i=0;i<90;i++){
-      const x = Math.random()*wrap.offsetWidth;
-      const y = Math.random()*wrap.offsetHeight;
-      const r = Math.random()*1.2+0.2;
-      const a = Math.random()*.7+.15;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.fillStyle = `rgba(255,255,255,${a})`;
-      ctx.fill();
-    }
+  const stars = [];
+  c.width = wrap.offsetWidth * dpr;
+  c.height = wrap.offsetHeight * dpr;
+  c.style.width = wrap.offsetWidth + 'px';
+  c.style.height = wrap.offsetHeight + 'px';
+  for(let i=0;i<90;i++){
+    stars.push({
+      x: Math.random()*wrap.offsetWidth,
+      y: Math.random()*wrap.offsetHeight,
+      r: Math.random()*1.2+0.2,
+      baseA: Math.random()*.7+.15,
+      speed: Math.random()*0.015+0.004,
+      phase: Math.random()*Math.PI*2
+    });
   }
-  resize();
+  const ctx = c.getContext('2d');
+  function draw(t){
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.save();
+    ctx.scale(dpr,dpr);
+    stars.forEach(s => {
+      const a = s.baseA*(0.5+0.5*Math.sin(t*s.speed+s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+a+')';
+      ctx.fill();
+    });
+    ctx.restore();
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
 })();
 
-// ── BUILDING WINDOWS ──
+// ── BUILDING WINDOWS (animated) ──
 (function(){
   const g = document.getElementById('wgrid');
+  const wins = [];
   for(let i=0;i<132;i++){
     const el = document.createElement('div');
     const v = Math.abs(Math.sin(i*17.3+1.1)*Math.cos(i*5.7+0.4));
     el.className = 'w'+(v>.72?' a':v>.60?' w2':v>.52?' c':'');
     g.appendChild(el);
+    wins.push(el);
   }
+  setInterval(() => {
+    const idx = Math.floor(Math.random()*wins.length);
+    const r = Math.random();
+    wins[idx].className = 'w'+(r>.7?' a':r>.5?' w2':r>.35?' c':'');
+  }, 1500);
 })();
 
 // ── SCROLL DOTS ──
@@ -1138,6 +1196,16 @@ html, body {
     if(row.scrollLeft>10) hint.style.opacity='0';
   }, {passive:true});
 })();
+
+// ── PARALLAX (desktop) ──
+if (window.matchMedia('(hover:hover)').matches) {
+  const bldg = document.querySelector('.building');
+  document.addEventListener('mousemove', e => {
+    const x = (e.clientX/window.innerWidth - 0.5)*2;
+    const y = (e.clientY/window.innerHeight - 0.5)*2;
+    bldg.style.transform = 'translate('+(x*3)+'px,'+(y*1.5)+'px)';
+  });
+}
 
 // ── SWIPE GIÙ: CHIUDE TASTIERA ──
 (function(){
@@ -1156,6 +1224,8 @@ html, body {
 
 // ── DATA ──
 const EMOJIS = ['💻','🖥️','🖨️','⌨️','🖱️','📱','🔌','🔋','💾','💿','📀','🗄️','📡','📺','📟','⚡','🔧','🪛','📦','📎'];
+
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
 const DEFAULT_DRIVERS = {
   daniel:  { name:'DANIEL',  car:'FERRARI 296 GT3',    color:'#ff4040', nextId:1, items:[] },
@@ -1202,10 +1272,18 @@ function saveData() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(DRIVERS),
       });
+      showToast();
     } catch(e) {
       console.error('Errore salvataggio npoint:', e);
     }
   }, 1500);
+}
+
+function showToast(msg){
+  const t=document.getElementById('saveToast');
+  t.textContent=msg||'✓ SALVATO';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 
 let DRIVERS = {};
@@ -1214,6 +1292,7 @@ let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
 // Carica dati all'avvio
 (async function init() {
   DRIVERS = await loadData();
+  document.getElementById('loadingOverlay').classList.add('hidden');
 })();
 
 // Build emoji picker
@@ -1236,7 +1315,7 @@ function openPanel(id) {
   const d = DRIVERS[id];
   const panel = document.getElementById('invPanel');
   panel.style.setProperty('--ac', d.color);
-  document.getElementById('pOwner').innerHTML = `<em>${d.name}</em>`;
+  document.getElementById('pOwner').innerHTML = '<em>'+escapeHtml(d.name)+'</em>';
   document.getElementById('pCar').textContent = '🚗 ' + d.car;
   document.getElementById('pSearch').value = '';
   renderTabs();
@@ -1287,8 +1366,8 @@ function renderList() {
       <div class="inv-item">
         <div class="ii-icon">${it.emoji}</div>
         <div class="ii-info">
-          <div class="ii-name">${it.name}</div>
-          <div class="ii-cat">${it.cat.toUpperCase()}</div>
+          <div class="ii-name">${escapeHtml(it.name)}</div>
+          <div class="ii-cat">${escapeHtml(it.cat.toUpperCase())}</div>
         </div>
         <div class="ii-right">
           <button class="qbtn" onclick="chQty('${curDriver}',${it.id},-1)">−</button>
@@ -1306,12 +1385,17 @@ function chQty(did,id,delta){
   const it = DRIVERS[did].items.find(i=>i.id===id);
   if(!it) return;
   it.qty = Math.max(0,it.qty+delta);
-  if(!it.qty){ delItem(did,id); return; }
+  if(!it.qty){
+    if(!confirm('Quantità a 0. Eliminare?')){it.qty=1;renderList();return;}
+    DRIVERS[did].items = DRIVERS[did].items.filter(i=>i.id!==id);
+    saveData(); renderTabs(); renderList(); return;
+  }
   saveData();
   renderTabs(); renderList();
 }
 
 function delItem(did,id){
+  if(!confirm('Eliminare questo oggetto?')) return;
   DRIVERS[did].items = DRIVERS[did].items.filter(i=>i.id!==id);
   saveData();
   renderTabs(); renderList();
@@ -1400,6 +1484,11 @@ document.getElementById('invPanel').addEventListener('touchmove', function(e) {
     e.preventDefault();
   }
 }, { passive: false });
+
+// ── ESC to close panel ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && curDriver) closePanel();
+});
 </script>
 </body>
 </html>
