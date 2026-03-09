@@ -93,7 +93,7 @@ html, body {
   top:-2px; left:50%;
   transform:translateX(-50%);
   background:rgba(3,8,16,.9);
-  border:1.5px solid rgba(255,20,80,.35);
+  border:1.5px solid rgba(26,106,255,.35);
   border-top-left-radius:4px;
   border-top-right-radius:4px;
   border-bottom:none;
@@ -105,16 +105,16 @@ html, body {
   font-family:'Bebas Neue',sans-serif;
   font-size: clamp(18px, 5vw, 28px);
   letter-spacing: clamp(4px, 2vw, 10px);
-  color:#ff1a5e;
-  text-shadow: 0 0 6px #ff1a5e, 0 0 18px rgba(255,26,94,.8), 0 0 40px rgba(255,26,94,.4);
+  color:#1a6aff;
+  text-shadow: 0 0 6px #1a6aff, 0 0 18px rgba(26,106,255,.8), 0 0 40px rgba(26,106,255,.4);
   animation: neonFlicker 9s ease-in-out infinite;
   display:block;
   line-height:1;
 }
 .sign-line {
   height:2px;
-  background:linear-gradient(90deg,transparent,#ff1a5e 20%,#ff1a5e 80%,transparent);
-  box-shadow: 0 0 8px rgba(255,26,94,.6);
+  background:linear-gradient(90deg,transparent,#1a6aff 20%,#1a6aff 80%,transparent);
+  box-shadow: 0 0 8px rgba(26,106,255,.6);
   margin-top:2px;
 }
 @keyframes neonFlicker{0%,100%{opacity:1}91%{opacity:1}92%{opacity:.8}93%{opacity:1}96%{opacity:.9}97%{opacity:1}}
@@ -1145,7 +1145,7 @@ html, body {
       y: Math.random()*wrap.offsetHeight,
       r: Math.random()*1.2+0.2,
       baseA: Math.random()*.7+.15,
-      speed: Math.random()*0.015+0.004,
+      speed: Math.random()*0.004+0.001,
       phase: Math.random()*Math.PI*2
     });
   }
@@ -1196,16 +1196,6 @@ html, body {
     if(row.scrollLeft>10) hint.style.opacity='0';
   }, {passive:true});
 })();
-
-// ── PARALLAX (desktop) ──
-if (window.matchMedia('(hover:hover)').matches) {
-  const bldg = document.querySelector('.building');
-  document.addEventListener('mousemove', e => {
-    const x = (e.clientX/window.innerWidth - 0.5)*2;
-    const y = (e.clientY/window.innerHeight - 0.5)*2;
-    bldg.style.transform = 'translate('+(x*3)+'px,'+(y*1.5)+'px)';
-  });
-}
 
 // ── SWIPE GIÙ: CHIUDE TASTIERA ──
 (function(){
