@@ -1,0 +1,37 @@
+{
+  "daniel": {
+    "name": "DANIEL",
+    "car": "FERRARI 296 GT3",
+    "color": "#ff4040",
+    "nextId": 1,
+    "items": []
+  },
+  "giovanni": {
+    "name": "GIOVANNI",
+    "car": "ALFA ROMEO 145 '90",
+    "color": "#ff3333",
+    "nextId": 1,
+    "items": []
+  },
+  "paolo": {
+    "name": "PAOLO",
+    "car": "PEUGEOT 5008 • 2005",
+    "color": "#3399ff",
+    "nextId": 1,
+    "items": []
+  },
+  "stefano": {
+    "name": "STEFANO",
+    "car": "BENTLEY CONTINENTAL",
+    "color": "#50c878",
+    "nextId": 1,
+    "items": []
+  },
+  "bryandaniele": {
+    "name": "BRYAN/DANIELE",
+    "car": "DACIA SANDERO",
+    "color": "#2a5f8a",
+    "nextId": 1,
+    "items": []
+  }
+}
