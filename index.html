@@ -819,6 +819,145 @@ html, body {
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ── SHOOTING STARS ── */
+.shooting-star {
+  position:absolute;
+  width:80px; height:1.5px;
+  background:linear-gradient(90deg,rgba(255,255,255,.8),transparent);
+  border-radius:1px;
+  opacity:0;
+  pointer-events:none;
+  z-index:2;
+}
+@keyframes shoot {
+  0%   { opacity:0; transform:translate(0,0) rotate(-35deg); }
+  10%  { opacity:1; }
+  100% { opacity:0; transform:translate(-260px,180px) rotate(-35deg); }
+}
+
+/* ── ITEM COUNT BADGE ── */
+.car-badge {
+  position:absolute;
+  top:-4px; right:2px;
+  min-width:18px; height:18px;
+  background:var(--ac, #00c8ff);
+  color:#000;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; font-weight:bold;
+  border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  padding:0 4px;
+  opacity:0; transform:scale(0);
+  transition:opacity .3s, transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:3;
+  pointer-events:none;
+  box-shadow:0 0 8px rgba(0,200,255,.4);
+}
+.car-badge.vis { opacity:1; transform:scale(1); }
+
+/* ── SWIPE DELETE ── */
+.inv-item { position:relative; overflow:hidden; }
+.inv-item .swipe-bg {
+  position:absolute;
+  top:0; right:0; bottom:0;
+  width:70px;
+  background:rgba(255,50,50,.85);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+  border-radius:0 12px 12px 0;
+  transform:translateX(100%);
+  transition:transform .2s;
+  pointer-events:none;
+}
+.inv-item.swiping .swipe-bg { transform:translateX(0); }
+
+/* ── ROAD MARKINGS ── */
+.ground::after {
+  content:'';
+  position:absolute;
+  top:8px; left:0; right:0;
+  height:2px;
+  background:repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,200,50,.12) 20px, rgba(255,200,50,.12) 40px);
+  pointer-events:none;
+}
+.spot::before {
+  content:'';
+  position:absolute;
+  bottom:0; left:50%;
+  transform:translateX(-50%);
+  width:60%; height:3px;
+  background:rgba(255,255,255,.06);
+  border-radius:2px;
+  pointer-events:none;
+}
+
+/* ── HEADLIGHT GLOW ── */
+.car-tap::before {
+  content:'';
+  position:absolute;
+  bottom:8px; left:2px;
+  width:18px; height:10px;
+  background:radial-gradient(ellipse at center, rgba(255,230,120,.18) 0%, transparent 70%);
+  border-radius:50%;
+  animation:headlightPulse 4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes headlightPulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ── RIPPLE EFFECT ── */
+.ripple-btn { position:relative; overflow:hidden; }
+.ripple-btn .ripple {
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,.25);
+  transform:scale(0);
+  animation:rippleAnim .5s ease-out;
+  pointer-events:none;
+}
+@keyframes rippleAnim{to{transform:scale(3);opacity:0}}
+
+/* ── IMPROVED EMPTY STATE ── */
+.empty-inv { padding:50px 20px; }
+.empty-inv .ei { font-size:52px; animation: emptyBob 2.5s ease-in-out infinite; }
+@keyframes emptyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.empty-inv .ei-sub {
+  font-size:9px;
+  color:rgba(255,255,255,.12);
+  margin-top:8px;
+  letter-spacing:2px;
+}
+
+/* ── PANEL OPEN BOUNCE ── */
+.inv-panel {
+  transition: transform .42s cubic-bezier(.22,1.15,.36,1);
+}
+
+/* ── CATEGORY SUGGESTION ── */
+.cat-suggestions {
+  display:flex; gap:4px;
+  flex-wrap:wrap;
+  margin-bottom:6px;
+  min-height:0;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .25s, margin .25s;
+}
+.cat-suggestions.vis { max-height:60px; margin-bottom:6px; }
+.cat-sug {
+  padding:3px 10px;
+  border-radius:12px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px;
+  letter-spacing:1px;
+  color:rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);
+  cursor:pointer;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cat-sug:active { background:rgba(0,200,255,.2); border-color:var(--ac); color:#fff; }
+
 
 </style>
 </head>
@@ -871,6 +1010,7 @@ html, body {
           <div class="sp-pole"></div>
         </div>
         <div class="car-tap" onclick="openPanel('daniel')">
+          <div class="car-badge" id="badge-daniel"></div>
           <svg width="90" height="40" viewBox="0 0 200 86" fill="none">
             <rect x="150" y="13" width="30" height="5" rx="2.5" fill="#0c0c0c"/>
             <rect x="156" y="18" width="3" height="11" rx="1" fill="#111"/>
@@ -913,6 +1053,7 @@ html, body {
           <div class="sp-pole"></div>
         </div>
         <div class="car-tap" onclick="openPanel('giovanni')">
+          <div class="car-badge" id="badge-giovanni"></div>
           <svg width="86" height="40" viewBox="0 0 190 86" fill="none">
             <path d="M15 72 L12 60 L16 50 L30 42 L46 34 L62 24 L76 19 L120 18 L140 20 L154 28 L163 40 L168 54 L170 72Z" fill="#9898a8"/>
             <path d="M15 62 L12 60 L170 60 L168 62Z" fill="#7a7a8a"/>
@@ -953,6 +1094,7 @@ html, body {
           <div class="sp-pole"></div>
         </div>
         <div class="car-tap" onclick="openPanel('paolo')">
+          <div class="car-badge" id="badge-paolo"></div>
           <svg width="88" height="44" viewBox="0 0 196 96" fill="none">
             <path d="M16 78 L13 65 L16 52 L24 42 L40 30 L57 21 L75 16 L128 16 L150 19 L164 29 L172 42 L176 58 L177 78Z" fill="#dde1e8"/>
             <path d="M16 68 L13 65 L177 65 L177 68Z" fill="#383840"/>
@@ -996,6 +1138,7 @@ html, body {
           <div class="sp-pole"></div>
         </div>
         <div class="car-tap" onclick="openPanel('stefano')">
+          <div class="car-badge" id="badge-stefano"></div>
           <svg width="92" height="38" viewBox="0 0 206 84" fill="none">
             <path d="M17 70 L13 60 L17 50 L27 40 L47 29 L67 22 L88 16 L128 15 L160 18 L178 26 L188 38 L193 52 L193 70Z" fill="#1a3c1a"/>
             <path d="M17 62 L13 60 L193 60 L193 62Z" fill="#122a12"/>
@@ -1044,6 +1187,7 @@ html, body {
           <div class="sp-pole"></div>
         </div>
         <div class="car-tap" onclick="openPanel('bryandaniele')">
+          <div class="car-badge" id="badge-bryandaniele"></div>
           <svg width="88" height="38" viewBox="0 0 200 84" fill="none">
             <path d="M16 70 L12 60 L16 50 L28 42 L48 32 L68 24 L90 18 L130 17 L155 20 L172 28 L182 40 L186 54 L186 70Z" fill="#2a5f8a"/>
             <path d="M16 62 L12 60 L186 60 L186 62Z" fill="#1e4a6e"/>
@@ -1117,6 +1261,7 @@ html, body {
   <div class="item-list" id="pList"></div>
   <div class="add-sect">
     <h4>+ Aggiungi oggetto</h4>
+    <div class="cat-suggestions" id="catSuggestions"></div>
     <div class="emoji-scroll" id="emojiRow"></div>
     <div class="add-row">
       <input class="add-inp" id="pName" placeholder="Nome..." style="flex:2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" inputmode="text">
@@ -1165,6 +1310,26 @@ html, body {
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
+})();
+
+// ── SHOOTING STARS ──
+(function(){
+  const skyWrap = document.querySelector('.sky-wrap');
+  function spawnShootingStar(){
+    const el = document.createElement('div');
+    el.className = 'shooting-star';
+    const w = skyWrap.offsetWidth;
+    const h = skyWrap.offsetHeight;
+    el.style.left = (Math.random()*w*0.8 + w*0.2) + 'px';
+    el.style.top = (Math.random()*h*0.5) + 'px';
+    const dur = 0.8 + Math.random()*0.6;
+    el.style.animation = 'shoot '+dur+'s linear forwards';
+    skyWrap.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+  setInterval(() => {
+    if(Math.random() < 0.4) spawnShootingStar();
+  }, 4000);
 })();
 
 // ── BUILDING WINDOWS (animated) ──
@@ -1282,8 +1447,21 @@ let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
 // Carica dati all'avvio
 (async function init() {
   DRIVERS = await loadData();
+  updateAllBadges();
   document.getElementById('loadingOverlay').classList.add('hidden');
 })();
+
+// ── BADGE UPDATE ──
+function updateAllBadges(){
+  for(const key in DEFAULT_DRIVERS){
+    const badge = document.getElementById('badge-'+key);
+    if(!badge) continue;
+    const d = DRIVERS[key];
+    const total = d ? d.items.reduce((s,i)=>s+i.qty, 0) : 0;
+    badge.textContent = total;
+    badge.classList.toggle('vis', total > 0);
+  }
+}
 
 // Build emoji picker
 const emojiRow = document.getElementById('emojiRow');
@@ -1310,6 +1488,7 @@ function openPanel(id) {
   document.getElementById('pSearch').value = '';
   renderTabs();
   renderList();
+  updateCatSuggestions();
   panel.classList.add('open');
   document.getElementById('overlay').classList.add('show');
   // Scroll item list to top
@@ -1344,31 +1523,65 @@ function renderList() {
   if (!curDriver) return;
   const d = DRIVERS[curDriver];
   const q = document.getElementById('pSearch').value.toLowerCase();
-  let items = d.items;
+  let items = [...d.items].sort((a,b) => a.name.localeCompare(b.name));
   if (activeTab !== 'Tutti') items = items.filter(i=>i.cat===activeTab);
   if (q) items = items.filter(i=>i.name.toLowerCase().includes(q)||i.cat.toLowerCase().includes(q));
 
   const el = document.getElementById('pList');
   if (!items.length) {
-    el.innerHTML = `<div class="empty-inv"><span class="ei">📭</span>NESSUN OGGETTO</div>`;
+    el.innerHTML = `<div class="empty-inv"><span class="ei">📭</span>NESSUN OGGETTO<div class="ei-sub">Aggiungi il primo oggetto qui sotto</div></div>`;
   } else {
     el.innerHTML = items.map(it=>`
-      <div class="inv-item">
+      <div class="inv-item" data-id="${it.id}" data-driver="${curDriver}">
+        <div class="swipe-bg">🗑</div>
         <div class="ii-icon">${it.emoji}</div>
         <div class="ii-info">
           <div class="ii-name">${escapeHtml(it.name)}</div>
           <div class="ii-cat">${escapeHtml(it.cat.toUpperCase())}</div>
         </div>
         <div class="ii-right">
-          <button class="qbtn" onclick="chQty('${curDriver}',${it.id},-1)">−</button>
+          <button class="qbtn ripple-btn" onclick="chQty('${curDriver}',${it.id},-1)">−</button>
           <span class="qnum">${it.qty}</span>
-          <button class="qbtn" onclick="chQty('${curDriver}',${it.id},1)">+</button>
-          <button class="dbtn" onclick="delItem('${curDriver}',${it.id})">🗑</button>
+          <button class="qbtn ripple-btn" onclick="chQty('${curDriver}',${it.id},1)">+</button>
+          <button class="dbtn ripple-btn" onclick="delItem('${curDriver}',${it.id})">🗑</button>
         </div>
       </div>`).join('');
+    // Init swipe-to-delete
+    el.querySelectorAll('.inv-item').forEach(initSwipeDelete);
   }
   document.getElementById('pTotalQty').textContent   = d.items.reduce((s,i)=>s+i.qty,0);
   document.getElementById('pTotalTypes').textContent = d.items.length;
+  updateAllBadges();
+}
+
+// ── SWIPE TO DELETE ──
+function initSwipeDelete(el){
+  let startX=0, dx=0, swiping=false;
+  el.addEventListener('touchstart',e=>{
+    startX = e.touches[0].clientX;
+    dx = 0; swiping = false;
+  },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    dx = startX - e.touches[0].clientX;
+    if(dx > 30){
+      swiping = true;
+      el.classList.add('swiping');
+    } else {
+      el.classList.remove('swiping');
+    }
+  },{passive:true});
+  el.addEventListener('touchend',()=>{
+    if(swiping && dx > 80){
+      const id = parseInt(el.dataset.id);
+      const did = el.dataset.driver;
+      if(confirm('Eliminare questo oggetto?')){
+        DRIVERS[did].items = DRIVERS[did].items.filter(i=>i.id!==id);
+        saveData(); renderTabs(); renderList();
+      }
+    }
+    el.classList.remove('swiping');
+    swiping = false; dx = 0;
+  },{passive:true});
 }
 
 function chQty(did,id,delta){
@@ -1378,7 +1591,7 @@ function chQty(did,id,delta){
   if(!it.qty){
     if(!confirm('Quantità a 0. Eliminare?')){it.qty=1;renderList();return;}
     DRIVERS[did].items = DRIVERS[did].items.filter(i=>i.id!==id);
-    saveData(); renderTabs(); renderList(); return;
+    saveData(); renderTabs(); renderList(); updateCatSuggestions(); return;
   }
   saveData();
   renderTabs(); renderList();
@@ -1388,7 +1601,7 @@ function delItem(did,id){
   if(!confirm('Eliminare questo oggetto?')) return;
   DRIVERS[did].items = DRIVERS[did].items.filter(i=>i.id!==id);
   saveData();
-  renderTabs(); renderList();
+  renderTabs(); renderList(); updateCatSuggestions();
 }
 
 function addItem(){
@@ -1403,8 +1616,38 @@ function addItem(){
   activeTab = 'Tutti';
   saveData();
   renderTabs(); renderList();
+  updateCatSuggestions();
   setTimeout(()=>{ document.getElementById('pList').scrollTop=99999; },50);
 }
+
+// ── CATEGORY SUGGESTIONS ──
+function updateCatSuggestions(){
+  const el = document.getElementById('catSuggestions');
+  if(!curDriver){el.classList.remove('vis');return;}
+  const d = DRIVERS[curDriver];
+  const existingCats = [...new Set(d.items.map(i=>i.cat))];
+  if(!existingCats.length){el.classList.remove('vis');el.innerHTML='';return;}
+  el.innerHTML = existingCats.map(c=>`<button class="cat-sug" type="button">${escapeHtml(c)}</button>`).join('');
+  el.classList.add('vis');
+  el.querySelectorAll('.cat-sug').forEach(btn=>{
+    btn.onclick = () => { document.getElementById('pCatIn').value = btn.textContent; };
+  });
+}
+
+// ── RIPPLE EFFECT ──
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.ripple-btn');
+  if(!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btn.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove());
+});
 
 // ── iOS KEYBOARD HANDLING ──
 const pNameInput = document.getElementById('pName');
