@@ -1174,13 +1174,19 @@ const NPOINT_ID = 'cc103022a61d05b6c970';
 
 // Carica dati da npoint.io (sempre remoto, niente cache locale)
 async function loadData() {
+  let data;
   try {
     const res = await fetch('https://api.npoint.io/' + NPOINT_ID);
-    if (res.ok) return await res.json();
+    if (res.ok) data = await res.json();
   } catch(e) {
     console.warn('Fetch npoint fallito', e);
   }
-  return JSON.parse(JSON.stringify(DEFAULT_DRIVERS));
+  if (!data) data = {};
+  // Merge missing drivers from DEFAULT_DRIVERS
+  for (const key in DEFAULT_DRIVERS) {
+    if (!data[key]) data[key] = JSON.parse(JSON.stringify(DEFAULT_DRIVERS[key]));
+  }
+  return data;
 }
 
 // Salva dati su npoint.io
