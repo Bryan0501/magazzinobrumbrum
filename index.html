@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
 <title>Parcheggio – Team Ufficio</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🅿️</text></svg>">
@@ -657,7 +657,7 @@ html, body {
 /* ── DESKTOP OPTIMIZATIONS ── */
 @media (min-width: 768px) {
   .scene {
-    max-width: 900px;
+    max-width: 700px;
     margin: 0 auto;
     height: 100vh;
     border-left: 1px solid rgba(255,255,255,.05);
@@ -665,9 +665,9 @@ html, body {
   }
 
   .building {
-    left: 10%;
-    right: 10%;
-    height: 90%;
+    left: 8%;
+    right: 8%;
+    height: 92%;
   }
 
   .sign-text {
@@ -684,25 +684,25 @@ html, body {
 
   .spot {
     flex: 0 0 calc(20% - 4px);
-    min-width: 120px;
-    max-width: 170px;
+    min-width: 100px;
+    max-width: 140px;
   }
 
   .sp-name {
     font-size: 15px;
     letter-spacing: 3px;
-    max-width: 140px;
+    max-width: 120px;
   }
   .sp-car {
     font-size: 8px;
     letter-spacing: 1px;
-    max-width: 140px;
+    max-width: 120px;
   }
 
   .car-tap svg,
   .car-tap img {
-    width: 130px;
-    height: 58px;
+    width: 120px;
+    height: 52px;
   }
 
   .scroll-dots,
@@ -726,13 +726,13 @@ html, body {
 
 @media (min-width: 1200px) {
   .scene {
-    max-width: 1100px;
+    max-width: 850px;
   }
 
   .building {
-    left: 12%;
-    right: 12%;
-    height: 88%;
+    left: 10%;
+    right: 10%;
+    height: 90%;
   }
 
   .sign-text {
@@ -742,8 +742,8 @@ html, body {
 
   .spot {
     flex: 0 0 calc(20% - 6px);
-    min-width: 150px;
-    max-width: 200px;
+    min-width: 120px;
+    max-width: 165px;
   }
 
   .sp-board {
@@ -752,17 +752,17 @@ html, body {
   .sp-name {
     font-size: 17px;
     letter-spacing: 3px;
-    max-width: 170px;
+    max-width: 150px;
   }
   .sp-car {
     font-size: 9px;
-    max-width: 170px;
+    max-width: 150px;
   }
 
   .car-tap svg,
   .car-tap img {
-    width: 155px;
-    height: 66px;
+    width: 140px;
+    height: 60px;
   }
 
   .pnum {
@@ -784,14 +784,22 @@ html, body {
   background:rgba(0,200,100,.92);
   color:#000;
   font-family:'Share Tech Mono',monospace;
-  font-size:11px;
-  letter-spacing:2px;
+  font-size:10px;
+  letter-spacing:1.5px;
   padding:8px 20px;
   border-radius:20px;
   opacity:0;
   transition:opacity .3s, transform .3s;
   z-index:200;
   pointer-events:none;
+  max-width:92vw;
+  text-align:center;
+  line-height:1.5;
+  word-break:break-word;
+}
+.save-toast.warn {
+  background:rgba(255,80,40,.92);
+  color:#fff;
 }
 .save-toast.show {
   opacity:1;
@@ -857,6 +865,28 @@ html, body {
 }
 .car-badge.vis { opacity:1; transform:scale(1); }
 
+/* ── WARNING BADGE ── */
+.car-warn {
+  position:absolute;
+  top:-4px; left:2px;
+  min-width:18px; height:18px;
+  background:#ff4040;
+  color:#fff;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px; font-weight:bold;
+  border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  padding:0 4px;
+  opacity:0; transform:scale(0);
+  transition:opacity .3s, transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:4;
+  pointer-events:none;
+  box-shadow:0 0 8px rgba(255,60,60,.5);
+  animation: warnPulse 1.5s ease-in-out infinite;
+}
+.car-warn.vis { opacity:1; transform:scale(1); }
+@keyframes warnPulse{0%,100%{box-shadow:0 0 8px rgba(255,60,60,.5)}50%{box-shadow:0 0 14px rgba(255,60,60,.8)}}
+
 /* ── SWIPE DELETE ── */
 .inv-item { position:relative; overflow:hidden; }
 .inv-item .swipe-bg {
@@ -892,19 +922,6 @@ html, body {
   border-radius:2px;
   pointer-events:none;
 }
-
-/* ── HEADLIGHT GLOW ── */
-.car-tap::before {
-  content:'';
-  position:absolute;
-  bottom:8px; left:2px;
-  width:18px; height:10px;
-  background:radial-gradient(ellipse at center, rgba(255,230,120,.18) 0%, transparent 70%);
-  border-radius:50%;
-  animation:headlightPulse 4s ease-in-out infinite;
-  pointer-events:none;
-}
-@keyframes headlightPulse{0%,100%{opacity:.6}50%{opacity:1}}
 
 /* ── RIPPLE EFFECT ── */
 .ripple-btn { position:relative; overflow:hidden; }
@@ -1013,6 +1030,7 @@ html, body {
         </div>
         <div class="car-tap" onclick="openPanel('daniel')">
           <div class="car-badge" id="badge-daniel"></div>
+          <div class="car-warn" id="warn-daniel">!</div>
           <img src="ferrari-daniel.png" alt="Ferrari 296 GT3" width="110" height="48" draggable="false" style="object-fit:contain;pointer-events:none;">
         </div>
       </div>
@@ -1029,6 +1047,7 @@ html, body {
         </div>
         <div class="car-tap" onclick="openPanel('giovanni')">
           <div class="car-badge" id="badge-giovanni"></div>
+          <div class="car-warn" id="warn-giovanni">!</div>
           <img src="alfa145-giovanni.png" alt="Alfa Romeo 145" width="110" height="48" draggable="false" style="object-fit:contain;pointer-events:none;">
         </div>
       </div>
@@ -1045,6 +1064,7 @@ html, body {
         </div>
         <div class="car-tap" onclick="openPanel('paolo')">
           <div class="car-badge" id="badge-paolo"></div>
+          <div class="car-warn" id="warn-paolo">!</div>
           <img src="peugeot5008-paolo.png" alt="Peugeot 5008" width="110" height="48" draggable="false" style="object-fit:contain;pointer-events:none;">
         </div>
       </div>
@@ -1061,6 +1081,7 @@ html, body {
         </div>
         <div class="car-tap" onclick="openPanel('stefano')">
           <div class="car-badge" id="badge-stefano"></div>
+          <div class="car-warn" id="warn-stefano">!</div>
           <img src="toyota-stefano.png" alt="Toyota Corolla" width="110" height="48" draggable="false" style="object-fit:contain;pointer-events:none;">
         </div>
       </div>
@@ -1077,6 +1098,7 @@ html, body {
         </div>
         <div class="car-tap" onclick="openPanel('bryandaniele')">
           <div class="car-badge" id="badge-bryandaniele"></div>
+          <div class="car-warn" id="warn-bryandaniele">!</div>
           <img src="sandero-bryandaniele.png" alt="Dacia Sandero" width="110" height="48" draggable="false" style="object-fit:contain;pointer-events:none;">
         </div>
       </div>
@@ -1290,11 +1312,13 @@ function saveData() {
   }, 1500);
 }
 
-function showToast(msg){
+function showToast(msg, duration){
   const t=document.getElementById('saveToast');
   t.textContent=msg||'✓ SALVATO';
+  t.classList.toggle('warn', !!(msg && msg.startsWith('⚠')));
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), duration||2000);
 }
 
 let DRIVERS = {};
@@ -1307,15 +1331,45 @@ let curDriver = null, activeTab = 'Tutti', selEmoji = '💻';
   document.getElementById('loadingOverlay').classList.add('hidden');
 })();
 
+// ── REQUIRED ITEMS CHECK ──
+const REQUIRED_ITEMS = [
+  { label:'CAVI ALIMENTAZIONE NORMALI', match:/(cav[io]|cavi)\s+aliment[a-z]*\s+normal/i },
+  { label:'CAVI ALIMENTAZIONE TRI', match:/(cav[io]|cavi)\s+aliment[a-z]*\s+(?!ups)tri/i },
+  { label:'CAVI ALIMENTAZIONE UPS', match:/(cav[io]|cavi)\s+aliment[a-z]*\s+ups(?!\s+tri)/i },
+  { label:'CAVI ALIMENTAZIONE UPS TRI', match:/(cav[io]|cavi)\s+aliment[a-z]*\s+ups\s+tri/i },
+  { label:'CAVI DP', match:/(cav[io]|cavi)\s+dp/i },
+  { label:'CAVI HDMI', match:/(cav[io]|cavi)\s+hdmi/i },
+  { label:'CAVI VGA', match:/(cav[io]|cavi)\s+vga/i },
+  { label:'ETHERNET 1M', match:/(eth|ethernet)\s*1\s*m/i },
+  { label:'ETHERNET 2M', match:/(eth|ethernet)\s*2\s*m/i },
+  { label:'ETHERNET 3M', match:/(eth|ethernet)\s*3\s*m/i },
+  { label:'ETHERNET 5M', match:/(eth|ethernet)\s*5\s*m/i },
+];
+
+function getMissingItems(driverKey){
+  const d = DRIVERS[driverKey];
+  if(!d) return REQUIRED_ITEMS.map(r=>r.label);
+  return REQUIRED_ITEMS.filter(req => {
+    const found = d.items.find(it => req.match.test(it.name) && it.qty >= 1);
+    return !found;
+  }).map(r => r.label);
+}
+
 // ── BADGE UPDATE ──
 function updateAllBadges(){
   for(const key in DEFAULT_DRIVERS){
     const badge = document.getElementById('badge-'+key);
+    const warn = document.getElementById('warn-'+key);
     if(!badge) continue;
     const d = DRIVERS[key];
     const total = d ? d.items.reduce((s,i)=>s+i.qty, 0) : 0;
     badge.textContent = total;
     badge.classList.toggle('vis', total > 0);
+    // Warning badge
+    if(warn){
+      const missing = getMissingItems(key);
+      warn.classList.toggle('vis', missing.length > 0);
+    }
   }
 }
 
@@ -1334,6 +1388,11 @@ EMOJIS.forEach(e => {
 });
 
 function openPanel(id) {
+  // Show missing items toast if warning badge is visible
+  const missing = getMissingItems(id);
+  if(missing.length > 0){
+    showToast('⚠ MANCANTI: ' + missing.join(', '), 5000);
+  }
   curDriver = id;
   activeTab = 'Tutti';
   const d = DRIVERS[id];
